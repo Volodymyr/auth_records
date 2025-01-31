@@ -1,6 +1,7 @@
 package recordapp
 
 import (
+	"auth_records/internal/auth/infrastructure/router"
 	"auth_records/pkg/server"
 	"auth_records/pkg/shutdown"
 	"auth_records/pkg/utils"
@@ -24,7 +25,8 @@ func Run() {
 	}()
 
 	// Initialize the Router
-	appRouter := router.New(apiHandler)
+	apiHandler := api.New(logger)
+	appRouter := router.New(apiHandler, authMiddleware)
 
 	// Initialize the server
 	s := server.New(&server.Config{
