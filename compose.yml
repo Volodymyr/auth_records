@@ -1,0 +1,60 @@
+version: '3.8'
+
+services:
+  auth-db:
+    image: postgres:15
+    container_name: auth-db
+    restart: always
+    environment:
+      - POSTGRES_USER=${POSTGRES_USERS_USER}
+      - POSTGRES_PASSWORD=${POSTGRES_USERS_PASSWORD}
+      - POSTGRES_DB=${POSTGRES_USERS_DB}
+    ports:
+      - "5433:5432"
+    volumes:
+      - auth_data:/var/lib/postgresql/data
+
+  records-db:
+    image: postgres:15
+    container_name: records-db
+    restart: always
+    environment:
+      - POSTGRES_USER=${POSTGRES_RECORS_USER}
+      - POSTGRES_PASSWORD=${POSTGRES_RECORS_PASSWORD}
+      - POSTGRES_DB=${POSTGRES_RECORS_DB}
+    ports:
+      - "5434:5432"
+    volumes:
+      - records_data:/var/lib/postgresql/data
+
+  auth-service:
+    image: auth_records/auth-service:latest
+    container_name: auth-service
+    depends_on:
+      - auth-db
+    environment:
+      DB_HOST: auth-db
+      DB_PORT: 5432
+      DB_USER: ${POSTGRES_USERS_USER}
+      DB_PASS: ${POSTGRES_USERS_PASSWORD}
+      DB_NAME: ${POSTGRES_USERS_DB}
+    ports:
+      - "8081:8081"
+
+  records-service:
+    image: auth_records/records-service:latest
+    container_name: records-service
+    depends_on:
+      - records-db
+    environment:
+      DB_HOST: records-db
+      DB_PORT: 5432
+      DB_USER: ${POSTGRES_RECORS_USER}
+      DB_PASS: ${POSTGRES_RECORS_PASSWORD}
+      DB_NAME: ${POSTGRES_RECORS_DB}
+    ports:
+      - "8082:8082"
+
+volumes:
+  auth_data:
+  records_data:

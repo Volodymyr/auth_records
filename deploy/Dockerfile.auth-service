@@ -1,0 +1,38 @@
+# Go build
+FROM golang:1.23.5-alpine3.21 AS go-builder
+
+WORKDIR /app
+
+RUN go env -w GOCACHE=/go-cache
+RUN go env -w GOMODCACHE=/gomod-cache
+
+RUN addgroup -S 1001 && adduser -S nonroot -G 1001
+
+COPY ../go.* .
+
+RUN --mount=type=cache,target=/go-cache \
+    --mount=type=cache,target=/gomod-cache \
+    go mod download
+
+RUN apk update && apk add musl-dev gcc build-base
+
+COPY ../. .
+
+RUN --mount=type=cache,target=/go-cache \
+    --mount=type=cache,target=/gomod-cache \
+    go build \
+        -ldflags="-linkmode external -extldflags -static" \
+        -o build/bin/auth cmd/auth/main.go
+
+# Final image
+FROM scratch
+
+WORKDIR /app
+
+COPY --from=go-builder /etc/passwd /etc/passwd
+
+COPY --from=go-builder /app/build/bin/auth /app/auth_records/auth
+
+USER nonroot
+
+CMD [ "/app/auth_records/auth" ]
