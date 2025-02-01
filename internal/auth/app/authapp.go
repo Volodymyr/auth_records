@@ -5,6 +5,7 @@ import (
 	"auth_records/internal/auth/infrastructure/router"
 	"auth_records/pkg/server"
 	"auth_records/pkg/shutdown"
+	"auth_records/pkg/token"
 	"auth_records/pkg/utils"
 	"fmt"
 
@@ -22,6 +23,8 @@ func Run() {
 	dbPort := utils.GetEnv("DB_PORT", "5432")
 	dbDatabase := utils.GetEnv("DB_DATABASE", "auth_users_development")
 
+	secretKey := []byte(utils.GetEnv("JWT_SECRET_KEY", "aautreddf12w"))
+
 	dbURL := utils.GetEnv("DATABASE_URL", fmt.Sprintf("postgres://%s:%s@%s:%s/%s", dbUser, dbPassword, dbHost, dbPort, dbDatabase))
 
 	// Initialize the logger
@@ -33,6 +36,9 @@ func Run() {
 			logger.Error("Error syncing logger", zap.Error(err))
 		}
 	}()
+
+	// Initialize Token Service
+	tokenService := token.NewJwtService(secretKey)
 
 	// Initialize Pg Client
 	pgClient := pgprovider.NewProvider(dbURL)

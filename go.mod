@@ -12,6 +12,7 @@ require (
 
 require (
 	github.com/go-chi/chi/v5 v5.2.0
+	github.com/golang-jwt/jwt v3.2.2+incompatible
 	github.com/golang-migrate/migrate/v4 v4.18.2
 	github.com/jmoiron/sqlx v1.4.0
 	github.com/lib/pq v1.10.9
