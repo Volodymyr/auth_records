@@ -1,8 +1,11 @@
 package authapp
 
 import (
+	"auth_records/internal/auth/adapter/api/v1"
+	"auth_records/internal/auth/adapter/storage"
 	"auth_records/internal/auth/infrastructure/pgprovider"
 	"auth_records/internal/auth/infrastructure/router"
+	"auth_records/internal/auth/usecase"
 	"auth_records/pkg/server"
 	"auth_records/pkg/shutdown"
 	"auth_records/pkg/token"
@@ -46,6 +49,15 @@ func Run() {
 	if err != nil {
 		logger.Error("Failed to connect to database", zap.Error(err))
 	}
+
+	// Initialize Repository
+	userRepo := storage.NewUserRepository(pgClient)
+
+	// Initialize UseCase
+	authUseCase := usecase.New(logger, userRepo, tokenService)
+
+	// Initialize API Handler
+	apiHandler := api.New(logger, authUseCase)
 
 	// Initialize the Router
 	appRouter := router.New(apiHandler)
