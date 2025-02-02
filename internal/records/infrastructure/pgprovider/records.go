@@ -5,15 +5,13 @@ import (
 	"context"
 )
 
-const queryUserByEmail = "SELECT id, title, content FROM records ORDER BY RANDOM() LIMIT 10"
+const queryRandomRecords = "SELECT id, title, content FROM records ORDER BY RANDOM() LIMIT 10"
 
 func (p *pgProvider) Records(ctx context.Context) ([]*pb.Record, error) {
-	rows, err := p.db.QueryContext(ctx, queryUserByEmail)
+	rows, err := p.db.QueryContext(ctx, queryRandomRecords)
 	if err != nil {
 		return nil, err
 	}
-	defer rows.Close()
-
 	defer rows.Close()
 
 	var records []*pb.Record
