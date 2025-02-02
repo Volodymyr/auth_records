@@ -5,15 +5,15 @@ import (
 	"context"
 )
 
-type storageProvider interface {
+type RecordsProvider interface {
 	Records(ctx context.Context) ([]*pb.Record, error)
 }
 
 type recordsRepository struct {
-	client storageProvider
+	client RecordsProvider
 }
 
-func NewRecordsRepository(client storageProvider) *recordsRepository {
+func NewRecordsRepository(client RecordsProvider) *recordsRepository {
 	return &recordsRepository{
 		client: client,
 	}

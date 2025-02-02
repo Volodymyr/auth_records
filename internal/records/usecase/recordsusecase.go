@@ -7,16 +7,16 @@ import (
 	"go.uber.org/zap"
 )
 
-type recordsRepository interface {
+type RecordsRepository interface {
 	Records(ctx context.Context) ([]*pb.Record, error)
 }
 
 type usecase struct {
 	log  *zap.Logger
-	repo recordsRepository
+	repo RecordsRepository
 }
 
-func New(log *zap.Logger, repo recordsRepository) *usecase {
+func New(log *zap.Logger, repo RecordsRepository) *usecase {
 	return &usecase{
 		log,
 		repo,
