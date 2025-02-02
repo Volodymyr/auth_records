@@ -28,6 +28,11 @@ func (p *pgProvider) Connect() error {
 
 	p.db = p.client.Conn()
 
+	// InitRecords checks if there are any records in the 'records' table and creates 20 random records if the table is empty.
+	if err := p.InitRecords(); err != nil {
+		return err
+	}
+
 	return nil
 }
 
