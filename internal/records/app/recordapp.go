@@ -1,8 +1,11 @@
 package recordapp
 
 import (
+	"auth_records/internal/records/adapters/grpcgetterhandlers"
+	"auth_records/internal/records/adapters/storage"
 	"auth_records/internal/records/infrastructure/grpc"
 	"auth_records/internal/records/infrastructure/pgprovider"
+	"auth_records/internal/records/usecase"
 	"auth_records/pkg/middleware"
 	"auth_records/pkg/server"
 	"auth_records/pkg/shutdown"
@@ -47,8 +50,19 @@ func Run() {
 		logger.Error("Failed to connect to database", zap.Error(err))
 	}
 
+	// Initialize repositories
+	recordsRepo := storage.NewRecordsRepository(pgClient)
+
+	// Initialize use case
+	recordsUseCase := usecase.New(logger, recordsRepo)
+
+	// Initialize grpc handler
+	grpcServerHandler := grpcgetterhandlers.New(logger, recordsUseCase)
+
 	jwtService := token.NewJwtService(secretKey)
 	authMiddleware := middleware.NewAuthMiddleware(jwtService)
+
+	//Initialize grpc server
 	grpcServer := grpc.NewServer(logger, port, grpcServerHandler, authMiddleware)
 
 	// Initialize the server
