@@ -32,6 +32,12 @@ seed-users-service-db:
 	DATABASE_URL="postgres://${POSTGRES_USERS_USER}:${POSTGRES_USERS_PASSWORD}@localhost:5432/${POSTGRES_USERS_DB}?sslmode=disable" \
 	go run internal/auth/db/seed/seed.go
 
+# generate records protos
+generate-records-protos:
+	protoc --go_out=. --go_opt=paths=source_relative \
+		--go-grpc_out=. --go-grpc_opt=paths=source_relative \
+		pkg/records_grpc/v1/records.proto
+
 # Run Go linter to check code quality
 run-go-linter:
 	golangci-lint run -v --timeout=10m

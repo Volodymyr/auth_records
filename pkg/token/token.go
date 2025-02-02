@@ -1,6 +1,7 @@
 package token
 
 import (
+	"context"
 	"errors"
 	"fmt"
 	"strconv"
@@ -33,7 +34,7 @@ func (j *JwtService) GenerateTokenWithID(userID uint64) (string, error) {
 	return token.SignedString(j.secretKey)
 }
 
-func (j *JwtService) VerifyToken(tokenString string) (*jwt.Token, error) {
+func (j *JwtService) VerifyToken(сtx context.Context, tokenString string) (*jwt.Token, error) {
 	token, err := jwt.Parse(tokenString, func(token *jwt.Token) (interface{}, error) {
 		return j.secretKey, nil
 	})
@@ -46,7 +47,7 @@ func (j *JwtService) VerifyToken(tokenString string) (*jwt.Token, error) {
 }
 
 func (j *JwtService) CheckJWTAndGetUserID(tokenString string) (uint64, error) {
-	token, err := j.VerifyToken(tokenString)
+	token, err := j.VerifyToken(context.Background(), tokenString)
 	if err != nil {
 		return 0, err
 	}

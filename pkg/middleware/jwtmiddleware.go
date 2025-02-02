@@ -2,12 +2,14 @@ package middleware
 
 import (
 	"context"
-	"net/http"
 	"strings"
+
+	"google.golang.org/grpc"
+	"google.golang.org/grpc/metadata"
 )
 
 type client interface {
-	VerifyToken(ctx context.Context, token string) uint64
+	CheckJWTAndGetUserID(token string) (uint64, error)
 }
 
 type ContextKey string
@@ -25,26 +27,29 @@ func NewAuthMiddleware(client client) *AuthMiddleware {
 	}
 }
 
-func (a *AuthMiddleware) JwtMiddleware(next http.HandlerFunc) http.HandlerFunc {
-	return func(w http.ResponseWriter, r *http.Request) {
-		tokenString := r.Header.Get("Authorization")
-		if tokenString == "" {
-			http.Error(w, "Unauthorized", http.StatusUnauthorized)
-
-			return
-		}
-
-		tokenString = strings.TrimPrefix(tokenString, BearerPrefix)
-
-		userId := a.client.VerifyToken(context.Background(), tokenString)
-
-		if userId == 0 {
-			http.Error(w, "Unauthorized", http.StatusUnauthorized)
-
-			return
-		}
-
-		ctx := context.WithValue(r.Context(), ContextUserIDKey, userId)
-		next(w, r.WithContext(ctx))
+func (a *AuthMiddleware) JwtUnaryInterceptor(
+	ctx context.Context,
+	req interface{},
+	info *grpc.UnaryServerInfo,
+	handler grpc.UnaryHandler,
+) (interface{}, error) {
+	md, ok := metadata.FromIncomingContext(ctx)
+	if !ok {
+		return nil, grpc.Errorf(16, "missing metadata")
 	}
+
+	authHeader, exists := md["authorization"]
+	if !exists || len(authHeader) == 0 {
+		return nil, grpc.Errorf(16, "missing token")
+	}
+
+	tokenString := strings.TrimPrefix(authHeader[0], BearerPrefix)
+
+	userID, err := a.client.CheckJWTAndGetUserID(tokenString)
+	if err != nil || userID == 0 {
+		return nil, grpc.Errorf(16, "invalid token")
+	}
+
+	newCtx := context.WithValue(ctx, ContextUserIDKey, userID)
+	return handler(newCtx, req)
 }

@@ -1,0 +1,21 @@
+syntax = "proto3";
+
+package records;
+
+option go_package = "auth_records/pkg/records_grpc/v1";
+
+service RecordsService {
+  rpc GetRandomRecords (GetRandomRecordsRequest) returns (GetRandomRecordsResponse);
+}
+
+message GetRandomRecordsRequest {}
+
+message Record {
+  int64 id = 1;
+  string title = 2;
+  string content = 3;
+}
+
+message GetRandomRecordsResponse {
+  repeated Record records = 1;
+}
