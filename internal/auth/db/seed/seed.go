@@ -37,7 +37,7 @@ func main() {
 			log.Fatalln("Error hashing password", err)
 		}
 
-		_, err = tx.Exec(`INSERT INTO users (nickname, password_hash, email, email_confirmed) VALUES($1, $2, $3, $4)`, user.UserName, heshPassword, user.Email)
+		_, err = tx.Exec(`INSERT INTO users (username, password_hash, email) VALUES($1, $2, $3)`, user.UserName, heshPassword, user.Email)
 		if err != nil {
 			log.Fatalln("Error inserting data:", err)
 		}

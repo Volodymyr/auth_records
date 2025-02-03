@@ -29,7 +29,7 @@ migrate-users-server-db:
 
 # Seed the Users service DB
 seed-users-service-db:
-	DATABASE_URL="postgres://${POSTGRES_USERS_USER}:${POSTGRES_USERS_PASSWORD}@localhost:5432/${POSTGRES_USERS_DB}?sslmode=disable" \
+	DATABASE_URL="postgres://${POSTGRES_USERS_USER}:${POSTGRES_USERS_PASSWORD}@localhost:5433/${POSTGRES_USERS_DB}?sslmode=disable" \
 	go run internal/auth/db/seed/seed.go
 
 # generate records protos
