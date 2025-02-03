@@ -66,14 +66,13 @@ func (a *api) Login(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	response := map[string]interface{}{
-		"token":   token,
-		"records": records,
+	recordsResponse := dto.RecordsResponse{
+		Records: records,
 	}
 
 	w.WriteHeader(http.StatusOK)
 
-	err = json.NewEncoder(w).Encode(response)
+	err = json.NewEncoder(w).Encode(recordsResponse)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 	}

@@ -60,11 +60,10 @@ func TestLogin_Success(t *testing.T) {
 
 	assert.Equal(t, http.StatusOK, rec.Code)
 
-	var response map[string]interface{}
+	var response dto.RecordsResponse
 	err := json.NewDecoder(rec.Body).Decode(&response)
 	assert.NoError(t, err)
-	assert.Equal(t, token, response["token"])
-	assert.Len(t, response["records"], 2)
+	assert.Len(t, response.Records, 2)
 
 	mockAuthUseCase.AssertExpectations(t)
 	mockRecordsClient.AssertExpectations(t)
