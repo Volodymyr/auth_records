@@ -19,13 +19,13 @@ build-services: build-auth-service build-records-service
 migrate-records-server-db:
 	DATABASE_URL="postgres://${POSTGRES_RECORS_USER}:${POSTGRES_RECORS_PASSWORD}@localhost:5434/${POSTGRES_RECORS_DB}?sslmode=disable" \
 	MIGRATE_PROJECT=records \
-	go run scripts/db/migrations.go $(cmd)
+	go run scripts/db/migrations.go up
 
 # Run migrations for Users DB
 migrate-users-server-db:
-	DATABASE_URL="postgres://${POSTGRES_USERS_USER}:${POSTGRES_USERS_PASSWORD}@localhost:5434/${POSTGRES_USERS_DB}?sslmode=disable" \
+	DATABASE_URL="postgres://${POSTGRES_USERS_USER}:${POSTGRES_USERS_PASSWORD}@localhost:5433/${POSTGRES_USERS_DB}?sslmode=disable" \
 	MIGRATE_PROJECT=auth \
-	go run scripts/db/migrations.go $(cmd)
+	go run scripts/db/migrations.go up
 
 # Seed the Users service DB
 seed-users-service-db:
