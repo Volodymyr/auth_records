@@ -12,6 +12,8 @@ import (
 	"auth_records/pkg/utils"
 	"fmt"
 
+	_ "github.com/jackc/pgx/v4/stdlib"
+
 	"go.uber.org/zap"
 )
 

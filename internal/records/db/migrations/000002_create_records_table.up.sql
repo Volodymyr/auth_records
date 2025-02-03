@@ -1,7 +1,7 @@
 CREATE TABLE records (
     id SERIAL PRIMARY KEY,
-    record_name VARCHAR(255) NOT NULL,
-    record_data TEXT,
+    title VARCHAR(255) NOT NULL,
+    content TEXT,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );

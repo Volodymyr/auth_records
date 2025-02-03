@@ -25,7 +25,7 @@ migrate-records-server-db:
 migrate-users-server-db:
 	DATABASE_URL="postgres://${POSTGRES_USERS_USER}:${POSTGRES_USERS_PASSWORD}@localhost:5433/${POSTGRES_USERS_DB}?sslmode=disable" \
 	MIGRATE_PROJECT=auth \
-	go run scripts/db/migrations.go up
+	go run scripts/db/migrations.go $(cmd)
 
 # Seed the Users service DB
 seed-users-service-db:

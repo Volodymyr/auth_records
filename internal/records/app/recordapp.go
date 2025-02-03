@@ -13,6 +13,7 @@ import (
 	"auth_records/pkg/utils"
 	"fmt"
 
+	_ "github.com/jackc/pgx/v4/stdlib"
 	"go.uber.org/zap"
 )
 
@@ -20,14 +21,13 @@ func Run() {
 	// Get ENV variables
 	host := utils.GetEnv("HOST", "localhost")
 	port := utils.GetEnv("PORT", "8080")
+	grpcPort := utils.GetEnv("GRPC_PORT", "50051")
 
 	dbUser := utils.GetEnv("DB_USER", "records_development")
 	dbPassword := utils.GetEnv("DB_PASSWORD", "records_development")
 	dbHost := utils.GetEnv("DB_HOST", "localhost")
 	dbPort := utils.GetEnv("DB_PORT", "5432")
 	dbDatabase := utils.GetEnv("DB_DATABASE", "records_development")
-
-	//grpcPort := utils.GetEnv("USERS_SERVER_PORT", "50051")
 
 	secretKey := []byte(utils.GetEnv("JWT_SECRET_KEY", "aautreddf12w"))
 
@@ -63,7 +63,7 @@ func Run() {
 	authMiddleware := middleware.NewAuthMiddleware(jwtService)
 
 	//Initialize grpc server
-	grpcServer := grpc.NewServer(logger, port, grpcServerHandler, authMiddleware)
+	grpcServer := grpc.NewServer(logger, grpcPort, grpcServerHandler, authMiddleware)
 
 	// Initialize the server
 	s := server.New(&server.Config{
