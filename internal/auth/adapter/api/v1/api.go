@@ -7,22 +7,30 @@ import (
 	"encoding/json"
 	"net/http"
 
+	pb "auth_records/pkg/records_grpc/v1"
+
 	"go.uber.org/zap"
 )
+
+type RecordsClient interface {
+	GetRandomRecords(token string) ([]*pb.Record, error)
+}
 
 type AuthUseCase interface {
 	Login(ctx context.Context, email string, password string) (string, error)
 }
 
 type api struct {
-	log         *zap.Logger
-	authUseCase AuthUseCase
+	log           *zap.Logger
+	authUseCase   AuthUseCase
+	recordsСlient RecordsClient
 }
 
-func New(log *zap.Logger, authUseCase AuthUseCase) *api {
+func New(log *zap.Logger, authUseCase AuthUseCase, recordsСlient RecordsClient) *api {
 	return &api{
 		log,
 		authUseCase,
+		recordsСlient,
 	}
 }
 
@@ -50,9 +58,22 @@ func (a *api) Login(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	records, err := a.recordsСlient.GetRandomRecords(token)
+	if err != nil {
+		a.log.Error("Failed to get records", zap.Error(err))
+		w.WriteHeader(http.StatusInternalServerError)
+		_, _ = w.Write([]byte("failed to fetch records"))
+		return
+	}
+
+	response := map[string]interface{}{
+		"token":   token,
+		"records": records,
+	}
+
 	w.WriteHeader(http.StatusOK)
 
-	err = json.NewEncoder(w).Encode(map[string]string{"token": token})
+	err = json.NewEncoder(w).Encode(response)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 	}

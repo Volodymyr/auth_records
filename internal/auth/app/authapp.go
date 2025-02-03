@@ -4,6 +4,7 @@ import (
 	"auth_records/internal/auth/adapter/api/v1"
 	"auth_records/internal/auth/adapter/storage"
 	"auth_records/internal/auth/infrastructure/pgprovider"
+	"auth_records/internal/auth/infrastructure/recordsgrpc"
 	"auth_records/internal/auth/infrastructure/router"
 	"auth_records/internal/auth/usecase"
 	"auth_records/pkg/server"
@@ -27,6 +28,9 @@ func Run() {
 	dbHost := utils.GetEnv("DB_HOST", "localhost")
 	dbPort := utils.GetEnv("DB_PORT", "5432")
 	dbDatabase := utils.GetEnv("DB_DATABASE", "auth_users_development")
+
+	gRPCRecordsHost := utils.GetEnv("RECORDS_CLIENT_HOST", "records-service")
+	gRPCRecordsPort := utils.GetEnv("RECORDS_CLIENT_PORT", "50051")
 
 	secretKey := []byte(utils.GetEnv("JWT_SECRET_KEY", "aautreddf12w"))
 
@@ -52,6 +56,8 @@ func Run() {
 		logger.Error("Failed to connect to database", zap.Error(err))
 	}
 
+	recordsgRPCClient := recordsgrpc.New(logger, gRPCRecordsHost, gRPCRecordsPort)
+
 	// Initialize Repository
 	userRepo := storage.NewUserRepository(pgClient)
 
@@ -59,7 +65,7 @@ func Run() {
 	authUseCase := usecase.New(logger, userRepo, tokenService)
 
 	// Initialize API Handler
-	apiHandler := api.New(logger, authUseCase)
+	apiHandler := api.New(logger, authUseCase, recordsgRPCClient)
 
 	// Initialize the Router
 	appRouter := router.New(apiHandler)
