@@ -27,12 +27,12 @@ migrate-users-server-db:
 	MIGRATE_PROJECT=auth \
 	go run scripts/db/migrations.go $(cmd)
 
-# Seed the Users service DB
+# Seed the Users auth DB
 seed-users-service-db:
 	DATABASE_URL="postgres://${POSTGRES_USERS_USER}:${POSTGRES_USERS_PASSWORD}@localhost:5433/${POSTGRES_USERS_DB}?sslmode=disable" \
 	go run internal/auth/db/seed/seed.go
 
-# generate records protos
+# Generate records protos
 generate-records-protos:
 	protoc --go_out=. --go_opt=paths=source_relative \
 		--go-grpc_out=. --go-grpc_opt=paths=source_relative \
