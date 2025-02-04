@@ -41,7 +41,7 @@ func (m *MockTokenService) CheckJWTAndGetUserID(tokenString string) (uint64, err
 func TestLogin_Success(t *testing.T) {
 	mockRepo := new(MockUserRepository)
 	mockTokenService := new(MockTokenService)
-	logger, _ := zap.NewProduction()
+	logger := zap.NewNop()
 	usecase := New(logger, mockRepo, mockTokenService)
 
 	email := "test@mail.com"
@@ -75,7 +75,7 @@ func TestLogin_Success(t *testing.T) {
 func TestLogin_UserNotFound(t *testing.T) {
 	mockRepo := new(MockUserRepository)
 	mockTokenService := new(MockTokenService)
-	logger, _ := zap.NewProduction()
+	logger := zap.NewNop()
 	usecase := New(logger, mockRepo, mockTokenService)
 
 	email := "notfound@mail.com"
@@ -96,7 +96,7 @@ func TestLogin_UserNotFound(t *testing.T) {
 func TestLogin_InvalidPassword(t *testing.T) {
 	mockRepo := new(MockUserRepository)
 	mockTokenService := new(MockTokenService)
-	logger, _ := zap.NewProduction()
+	logger := zap.NewNop()
 	usecase := New(logger, mockRepo, mockTokenService)
 
 	email := "test@mail.com"
@@ -130,7 +130,7 @@ func TestLogin_InvalidPassword(t *testing.T) {
 func TestLogin_TokenGenerationFailure(t *testing.T) {
 	mockRepo := new(MockUserRepository)
 	mockTokenService := new(MockTokenService)
-	logger, _ := zap.NewProduction()
+	logger := zap.NewNop()
 	usecase := New(logger, mockRepo, mockTokenService)
 
 	email := "test@mail.com"
